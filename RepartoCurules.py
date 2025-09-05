@@ -3,8 +3,38 @@ from collections import Counter
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
+import numpy as np
+import math
 
 st.set_page_config(page_title="Asignación de curules (MX)", layout="wide")
+
+colores = {
+    "PAN": "#27357e",
+    "PRI": "#009905",
+    "PRD": "#F0F400",
+    "PT":  "#ff0000",
+    "PVEM": "#2E8B57",
+    "MC":  "#F28C28",
+    "MORENA": "#af272f",
+    "PES": "#6F42C1",
+    "NA": "#00AEEF",
+    "RSP": "#C2185B",
+    "FXM": "#9C27B0",
+    "INDEP": "#808080"
+    }
+
+# Cambiar color de fondo de la página a azul
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background-color: #042861; /* Azul fuerte */
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ------------------------------
 # Orden fijo y utilidades
@@ -249,17 +279,78 @@ if st.button("Calcular asignación", type="primary"):
         st.success("Ningún partido válido excede el tope con los parámetros dados.")
 
     # Gráfica
-    st.markdown("### Curules totales (MR + RP) — solo válidos")
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar(df_res["Partido"], df_res["Total"])
-    ax.set_xlabel("Partido")
-    ax.set_ylabel("Curules")
-    title = "Curules asignados (partidos ≥ umbral)"
-    if anio_label:
-        title += f" — {anio_label}"
-    ax.set_title(title)
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
+    # st.markdown("### Curules totales (MR + RP) — solo válidos")
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # ax.bar(df_res["Partido"], df_res["Total"])
+    # ax.set_xlabel("Partido")
+    # ax.set_ylabel("Curules")
+    # title = "Curules asignados (partidos ≥ umbral)"
+    # if anio_label:
+    #     title += f" — {anio_label}"
+    # ax.set_title(title)
+    # plt.xticks(rotation=45)
+    # st.pyplot(fig)
+
+
+# Colores sugeridos (ajústalos si quieres)
+
+
+    # Parámetros del hemiciclo
+    filas = 10
+    r_min, r_max = 1.0, 3.5
+    theta_ini, theta_fin = math.pi, 0.0
+
+    total_curules = sum(curules_totales.values())
+    radios = np.linspace(r_min, r_max, filas)
+    pesos = radios / radios.sum()
+    asientos_por_fila = np.floor(pesos * total_curules).astype(int)
+    faltan = total_curules - asientos_por_fila.sum()
+    for i in np.argsort(-radios)[:faltan]:
+        asientos_por_fila[i] += 1
+
+    # Generar puntos
+    puntos, angulos = [], []
+    for r, n in zip(radios, asientos_por_fila):
+        if n <= 0: 
+            continue
+        thetas = np.linspace(theta_ini, theta_fin, n, endpoint=True)
+        xs, ys = r*np.cos(thetas), r*np.sin(thetas)
+        for x, y, th in zip(xs, ys, thetas):
+            puntos.append({"x": float(x), "y": float(y)})
+            angulos.append(th)
+
+    # Ordenar por ángulo y asignar etiquetas en bloques
+    orden_idx = np.argsort(angulos)
+    puntos = [puntos[i] for i in orden_idx]
+    etiquetas = []
+    for llave, n in curules_totales.items():
+        etiquetas.extend([llave]*n)
+    for i, p in enumerate(puntos):
+        p["partido"] = etiquetas[i]
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(4, 4))
+    for llave in curules_totales.keys():
+        xs = [q["x"] for q in puntos if q["partido"] == llave]
+        ys = [q["y"] for q in puntos if q["partido"] == llave]
+        ax.scatter(xs, ys,
+                s=35, edgecolors="k", linewidths=0.3, alpha=0.9,
+                c=colores.get(llave, "#808080"), label=llave)
+
+    ax.set_aspect("equal", adjustable="box")
+    ax.axis("off")
+    ax.legend(ncol=max(1, min(6, len(curules_totales))),
+            loc="upper center", bbox_to_anchor=(0.5, 1.12),
+            frameon=False)
+    ax.set_title(f"Hemiciclo de {total_curules} curules", pad=10)
+
+    st.pyplot(fig, clear_figure=True)
+
+
+
+#####################
+
+
 
     # Descargas
     st.markdown("### Descargar resultados (solo válidos)")

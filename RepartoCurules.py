@@ -23,13 +23,16 @@ colores = {
     "INDEP": "#808080"
     }
 
+PARTY_ORDER = ["PAN","PRI","PRD","PT","PVEM","MC","MORENA"]
+
 st.sidebar.title("Navegación:")
 pagina = st.sidebar.radio("Elige un programa:", ["Cálculo de sobrerrepresentación", "Reparto de curules por RP"])
 
+
+
 if pagina == "Cálculo de sobrerrepresentación":
-    st.title("Ejecutando Cálculo de sobrerrepresentación")
     # tu código del primer programa aquí
-    st.set_page_config(page_title="Asignación de curules (MX)", layout="wide")
+    # st.set_page_config(page_title="Asignación de curules (MX)", layout="wide")
 
     # Cambiar color de fondo de la página a azul
     st.markdown(
@@ -47,7 +50,6 @@ if pagina == "Cálculo de sobrerrepresentación":
     # ------------------------------
     # Orden fijo y utilidades
     # ------------------------------
-    PARTY_ORDER = ["PAN","PRI","PRD","PT","PVEM","MC","MORENA","PES","NA","RSP","FXM","INDEP"]
 
     def sort_parties_df(df: pd.DataFrame) -> pd.DataFrame:
         """Ordena un DataFrame con columna 'Partido' usando PARTY_ORDER primero;
@@ -110,40 +112,40 @@ if pagina == "Cálculo de sobrerrepresentación":
     # Presets (2018, 2021, 2024)
     # ------------------------------
     PRESETS = {
-        2018: {
-            "anio": 2018,
-            "votacion_total_emitida": 55946772,
-            "votos_eliminar": {"Nulos": 2226781, "NoRegistrados": 32611},
-            "votos": {
-                "PAN": 10033157, "PRI": 9271950, "PRD": 2959800, "PT": 2201192,
-                "PVEM": 2685677, "MC": 2473056, "MORENA": 20790623, "PES": 1347540,
-                "NA": 1385421, "INDEP": 538964
-            },
-            "mr": {
-                "PAN": 40, "PRI": 7, "PRD": 9, "PT": 58, "PVEM": 5, "MC": 17,
-                "MORENA": 106, "PES": 56, "NA": 2, "INDEP": 0
-            }
-        },
-        2021: {
-            "anio": 2021,
-            "votacion_total_emitida": 48813142,
-            "votos_eliminar": {"Nulos": 1660363, "NoRegistrados": 41558},
-            "votos": {
-                "PAN": 8896470, "PRI": 8663257, "PRD": 1785351, "PT": 1588152,
-                "PVEM": 2659178, "MC": 3425006, "MORENA": 16629905,
-                "PES": 1344835, "RSP": 864391, "FXM": 1210384, "INDEP": 44292
-            },
-            "mr": {
-                "PAN": 73, "PRI": 30, "PRD": 7, "PT": 30, "PVEM": 31, "MC": 7,
-                "MORENA": 122, "PES": 0, "RSP": 0, "FXM": 0, "INDEP": 0
-            }
-        },
+        # 2018: {
+        #     "anio": 2018,
+        #     "votacion_total_emitida": 55946772,
+        #     "votos_eliminar": {"Nulos": 2226781, "NoRegistrados": 32611},
+        #     "votos": {
+        #         "PAN": 10033157, "PRI": 9271950, "PRD": 2959800, "PT": 2201192,
+        #         "PVEM": 2685677, "MC": 2473056, "MORENA": 20790623, "PES": 1347540,
+        #         "NA": 1385421, "INDEP": 538964
+        #     },
+        #     "mr": {
+        #         "PAN": 40, "PRI": 7, "PRD": 9, "PT": 58, "PVEM": 5, "MC": 17,
+        #         "MORENA": 106, "PES": 56, "NA": 2, "INDEP": 0
+        #     }
+        # },
+        # 2021: {
+        #     "anio": 2021,
+        #     "votacion_total_emitida": 48813142,
+        #     "votos_eliminar": {"Nulos": 1660363, "NoRegistrados": 41558},
+        #     "votos": {
+        #         "PAN": 8896470, "PRI": 8663257, "PRD": 1785351, "PT": 1588152,
+        #         "PVEM": 2659178, "MC": 3425006, "MORENA": 16629905,
+        #         "PES": 1344835, "RSP": 864391, "FXM": 1210384, "INDEP": 44292
+        #     },
+        #     "mr": {
+        #         "PAN": 73, "PRI": 30, "PRD": 7, "PT": 30, "PVEM": 31, "MC": 7,
+        #         "MORENA": 122, "PES": 0, "RSP": 0, "FXM": 0, "INDEP": 0
+        #     }
+        # },
         2024: {
             "anio": 2024,
             "votacion_total_emitida": 59447863,
             "votos_eliminar": {"Nulos": 2189171, "NoRegistrados": 49305},
             "votos": {
-                "PAN": 10046629, "PRI": 6622242, "PRD": 1449176, "PT": 3253564,
+                "PAN": 10046629, "PRI": 6622242, "PRD": 1449175, "PT": 3253564,
                 "PVEM": 4992286, "MC": 6495521, "MORENA": 24277957, "INDEP": 72012
             },
             "mr": {
@@ -156,19 +158,23 @@ if pagina == "Cálculo de sobrerrepresentación":
     # ------------------------------
     # Encabezado y carga de presets (arriba)
     # ------------------------------
-    st.title("Calculadora de diputaciones por Representación Proporcional.")
-    st.caption("Calcula curules asignados de RP.")
+    st.title("Calculadora de sobrerepresentación.")
 
     colA, colB = st.columns([2,3])
     with colA:
         st.subheader("Cargar datos predefinidos")
+        st.markdown("Selecciona un preset para cargar votos y curules de Mayoría Relativa.")
         preset_choice = st.selectbox("Elegir año", [2018, 2021, 2024], index=2, key="preset_choice_main")
         load = st.button("Cargar preset", type="primary", use_container_width=True)
 
+    if "seats_mr" not in st.session_state:
+        seats_mr = 300
+        
     with colB:
         st.subheader("Parámetros globales")
-        seats_mr = st.number_input("Curules de MR", min_value=0, max_value=500, value=300, step=1, help="Mayoría Relativa")
-        seats_rp = st.number_input("Curules de RP", min_value=0, max_value=500, value=200, step=1, help="Representación Proporcional")
+        st.markdown("El cálculo se hará con base en 300 curules de MR más el parámetro elegido.")
+        #seats_mr = st.number_input("Curules de MR", min_value=0, max_value=500, value=300, step=1, help="Mayoría Relativa")
+        seats_rp = st.number_input("Curules de RP", min_value=1, max_value=500, value=200, step=1, help="Representación Proporcional")
         # umbral = st.number_input("Umbral legal (p.ej. 0.03 = 3%)", min_value=0.0, max_value=1.0, value=0.03, step=0.01, format="%.2f")
         # bonus_cap = st.number_input("Tope de sobrerrepresentación (extra)", min_value=0.0, max_value=1.0, value=0.08, step=0.01, format="%.2f",
         #                             help="Máximo permitido = porcentaje válido + este extra, sobre el total de curules MR+RP.")
@@ -280,11 +286,60 @@ if pagina == "Cálculo de sobrerrepresentación":
         # Advertencias
         exceden = df_res[df_res["⚠️ Excede tope"]]
         if not exceden.empty:
-            st.warning("Algunos partidos válidos exceden el tope de sobrerrepresentación. Requiere ajuste conforme a la ley.")
-            for _, r in exceden.iterrows():
-                st.write(f"• {r['Partido']}: Total = {r['Total']} vs Máximo = {r['Máximo permitido']}  → Excede por {r['Total'] - r['Máximo permitido']} curules.")
+            st.markdown(
+            f"""
+            <div style="
+                background: linear-gradient(90deg, #ff512f 0%, #f09819 100%);
+                color: #fff;
+                padding: 18px 32px;
+                border-radius: 14px;
+                box-shadow: 0 4px 16px rgba(240,152,25,0.18);
+                font-size: 1.15em;
+                font-weight: 600;
+                margin-bottom: 18px;
+                display: inline-block;
+                border: 2px solid #fff;
+            ">
+                <span style="font-size:1.1em;letter-spacing:0.5px;">⚠️ <b>Alerta de sobrerepresentación</b></span>
+                <br>
+                <span style="font-size:1.05em;">
+                Algunos partidos válidos exceden el tope de sobrerrepresentación.<br>
+                <ul style="margin:0.5em 0 0 1.2em;">
+                {''.join(
+                    f"<li><b>{r['Partido']}</b>: Total = {r['Total']} vs Máximo = {r['Máximo permitido']} → <b>Excede por {r['Total'] - r['Máximo permitido']} curules</b>.</li>"
+                    for _, r in exceden.iterrows()
+                )}
+                </ul>
+                <span style="font-size:0.95em;">Requiere ajuste conforme a la ley.</span>
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True
+            )
         else:
-            st.success("Ningún partido válido excede el tope con los parámetros dados.")
+            st.markdown(
+            """
+            <div style="
+                background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+                color: #fff;
+                padding: 18px 32px;
+                border-radius: 14px;
+                box-shadow: 0 4px 16px rgba(30,60,114,0.12);
+                font-size: 1.15em;
+                font-weight: 600;
+                margin-bottom: 18px;
+                display: inline-block;
+                border: 2px solid #fff;
+            ">
+                <span style="font-size:1.1em;letter-spacing:0.5px;">✅ <b>Sin sobrerepresentación</b></span>
+                <br>
+                <span style="font-size:1.05em;">
+                Ningún partido válido excede el tope con los parámetros dados.
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True
+            )
 
         # Gráfica
         # st.markdown("### Curules totales (MR + RP) — solo válidos")
@@ -300,87 +355,87 @@ if pagina == "Cálculo de sobrerrepresentación":
         # st.pyplot(fig)
 
 
-    # Colores sugeridos (ajústalos si quieres)
+    # # Colores sugeridos (ajústalos si quieres)
 
 
-        # Parámetros del hemiciclo
-        filas = 10
-        r_min, r_max = 1.0, 3.5
-        theta_ini, theta_fin = math.pi, 0.0
+    #     # Parámetros del hemiciclo
+    #     filas = 10
+    #     r_min, r_max = 1.0, 3.5
+    #     theta_ini, theta_fin = math.pi, 0.0
 
-        total_curules = sum(curules_totales.values())
-        radios = np.linspace(r_min, r_max, filas)
-        pesos = radios / radios.sum()
-        asientos_por_fila = np.floor(pesos * total_curules).astype(int)
-        faltan = total_curules - asientos_por_fila.sum()
-        for i in np.argsort(-radios)[:faltan]:
-            asientos_por_fila[i] += 1
+    #     total_curules = sum(curules_totales.values())
+    #     radios = np.linspace(r_min, r_max, filas)
+    #     pesos = radios / radios.sum()
+    #     asientos_por_fila = np.floor(pesos * total_curules).astype(int)
+    #     faltan = total_curules - asientos_por_fila.sum()
+    #     for i in np.argsort(-radios)[:faltan]:
+    #         asientos_por_fila[i] += 1
 
-        # Generar puntos
-        puntos, angulos = [], []
-        for r, n in zip(radios, asientos_por_fila):
-            if n <= 0: 
-                continue
-            thetas = np.linspace(theta_ini, theta_fin, n, endpoint=True)
-            xs, ys = r*np.cos(thetas), r*np.sin(thetas)
-            for x, y, th in zip(xs, ys, thetas):
-                puntos.append({"x": float(x), "y": float(y)})
-                angulos.append(th)
+    #     # Generar puntos
+    #     puntos, angulos = [], []
+    #     for r, n in zip(radios, asientos_por_fila):
+    #         if n <= 0: 
+    #             continue
+    #         thetas = np.linspace(theta_ini, theta_fin, n, endpoint=True)
+    #         xs, ys = r*np.cos(thetas), r*np.sin(thetas)
+    #         for x, y, th in zip(xs, ys, thetas):
+    #             puntos.append({"x": float(x), "y": float(y)})
+    #             angulos.append(th)
 
-        # Ordenar por ángulo y asignar etiquetas en bloques
-        orden_idx = np.argsort(angulos)
-        puntos = [puntos[i] for i in orden_idx]
-        etiquetas = []
-        for llave, n in curules_totales.items():
-            etiquetas.extend([llave]*n)
-        for i, p in enumerate(puntos):
-            p["partido"] = etiquetas[i]
+    #     # Ordenar por ángulo y asignar etiquetas en bloques
+    #     orden_idx = np.argsort(angulos)
+    #     puntos = [puntos[i] for i in orden_idx]
+    #     etiquetas = []
+    #     for llave, n in curules_totales.items():
+    #         etiquetas.extend([llave]*n)
+    #     for i, p in enumerate(puntos):
+    #         p["partido"] = etiquetas[i]
 
-        # Plot
-        col_plot, _ = st.columns([1, 2])
-        with col_plot:
-            fig, ax = plt.subplots(figsize=(4.6, 3.2), dpi=150)
+    #     # Plot
+    #     col_plot, _ = st.columns([1, 2])
+    #     with col_plot:
+    #         fig, ax = plt.subplots(figsize=(4.6, 3.2), dpi=150)
 
-            marker_size = max(10, int(1400 / max(1, total_curules)))
+    #         marker_size = max(10, int(1400 / max(1, total_curules)))
 
-            for llave in curules_totales.keys():
-                xs = [q["x"] for q in puntos if q["partido"] == llave]
-                ys = [q["y"] for q in puntos if q["partido"] == llave]
-                ax.scatter(
-                    xs, ys,
-                    s=marker_size,
-                    edgecolors="k",
-                    linewidths=0.25,
-                    alpha=0.95,
-                    c=colores.get(llave, "#808080"),
-                    label=llave
-                )
+    #         for llave in curules_totales.keys():
+    #             xs = [q["x"] for q in puntos if q["partido"] == llave]
+    #             ys = [q["y"] for q in puntos if q["partido"] == llave]
+    #             ax.scatter(
+    #                 xs, ys,
+    #                 s=marker_size,
+    #                 edgecolors="k",
+    #                 linewidths=0.25,
+    #                 alpha=0.95,
+    #                 c=colores.get(llave, "#808080"),
+    #                 label=llave
+    #             )
 
-            ax.set_aspect("equal", adjustable="box")
-            ax.axis("off")
+    #         ax.set_aspect("equal", adjustable="box")
+    #         ax.axis("off")
 
-            # título bien arriba
-            ax.set_title(
-                f"Distribución de curules por partido",
-                pad=2, fontsize=12, weight="bold"
-            )
+    #         # título bien arriba
+    #         ax.set_title(
+    #             f"Distribución de curules por partido",
+    #             pad=2, fontsize=12, weight="bold"
+    #         )
 
-            # leyenda abajo centrada
-            ax.legend(
-                ncol=min(6, len(curules_totales)),
-                loc="lower center",
-                bbox_to_anchor=(0.5, -0.15),
-                frameon=False,
-                fontsize=8,
-                markerscale=0.8,
-                handlelength=1.0,
-                handletextpad=0.4,
-                columnspacing=0.8
-            )
+    #         # leyenda abajo centrada
+    #         ax.legend(
+    #             ncol=min(6, len(curules_totales)),
+    #             loc="lower center",
+    #             bbox_to_anchor=(0.5, -0.15),
+    #             frameon=False,
+    #             fontsize=8,
+    #             markerscale=0.8,
+    #             handlelength=1.0,
+    #             handletextpad=0.4,
+    #             columnspacing=0.8
+    #         )
 
-            plt.subplots_adjust(top=0.9, bottom=0.25, left=0.05, right=0.95)
+    #         plt.subplots_adjust(top=0.9, bottom=0.25, left=0.05, right=0.95)
 
-            st.pyplot(fig, clear_figure=True, use_container_width=False)
+    #         st.pyplot(fig, clear_figure=True, use_container_width=False)
 
 
 
@@ -412,7 +467,6 @@ if pagina == "Cálculo de sobrerrepresentación":
 
 
 elif pagina == "Reparto de curules por RP":
-    PARTY_ORDER = ["PAN","PRI","PRD","PT","PVEM","MC","MORENA"]
 
     def sort_parties_df(df: pd.DataFrame) -> pd.DataFrame:
         """Ordena un DataFrame con columna 'Partido' usando PARTY_ORDER primero;
@@ -484,7 +538,7 @@ elif pagina == "Reparto de curules por RP":
     with colB:
         st.subheader("Parámetros")
         st.markdown("El cálculo se hará con base en 300 curules de MR más el parámetro elegido.")
-        seats_rp = st.number_input("Curules de RP", min_value=0, max_value=200, value=200, step=1, help="Representación Proporcional")
+        seats_rp = st.number_input("Curules de RP", min_value=1, max_value=200, value=200, step=1, help="Representación Proporcional")
         st.markdown("---")
         st.subheader("Votos no válidos / a eliminar")
         if "nulos" not in st.session_state: st.session_state["nulos"] = 0

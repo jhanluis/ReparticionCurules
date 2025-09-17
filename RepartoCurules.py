@@ -164,7 +164,7 @@ if pagina == "Cálculo de sobrerrepresentación":
     with colA:
         st.subheader("Cargar datos predefinidos")
         st.markdown("Selecciona un preset para cargar votos y curules de Mayoría Relativa.")
-        preset_choice = st.selectbox("Elegir año", [2018, 2021, 2024], index=2, key="preset_choice_main")
+        preset_choice = st.selectbox("Elegir año", [2024], index=0, key="preset_choice_main")
         load = st.button("Cargar preset", type="primary", use_container_width=True)
 
     if "seats_mr" not in st.session_state:
